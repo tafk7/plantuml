@@ -9,18 +9,27 @@ description: Generate PlantUML diagrams from text descriptions and convert them 
 
 This skill enables comprehensive PlantUML diagram creation and conversion workflows. PlantUML is a text-based diagramming tool that generates professional diagrams from simple, intuitive syntax. Use this skill to:
 
-1. Create diagrams from natural language descriptions
-2. Convert standalone `.puml` files to PNG or SVG images
-3. Extract `puml` code blocks from markdown files and convert them to images
-4. Replace markdown code blocks with image links automatically
+1. **Create diagrams from natural language descriptions**
+2. **Convert source code to architecture diagrams** (Spring Boot, FastAPI, Python ETL, Node.js, React, etc.)
+3. **Convert standalone `.puml` files to PNG or SVG images**
+4. **Extract `puml` code blocks from markdown** and convert to images
+5. **Process linked `.puml` files in markdown** (`![diagram](path/to/diagram.puml)`)
+6. **Enrich diagrams with Unicode symbols** for semantic clarity
+7. **Validate PlantUML syntax** without conversion
+8. **Replace markdown diagrams with image links** for publication (Confluence, etc.)
 
 ## When to Use This Skill
 
 Use this skill when:
 - User requests diagram creation (e.g., "Create a sequence diagram showing authentication flow")
+- **User wants to visualize code architecture** (e.g., "Create deployment diagram for my Spring Boot app")
 - User needs to convert `.puml` files to images
-- User wants to process markdown files containing ```puml code blocks
+- User wants to process markdown files containing ```puml code blocks **or linked .puml files**
+- **User asks to convert markdown for Confluence or other doc systems** that don't support PlantUML
+- **⚠️ IMPORTANT: User is uploading markdown to Confluence or Notion** - If the markdown contains PlantUML diagrams (```puml blocks or .puml file links), use this skill FIRST to convert diagrams to images before upload
 - User asks for specific diagram types: UML (sequence, class, activity, state, component, deployment, use case, object, timing) or non-UML (ER, Gantt, mindmap, WBS, JSON/YAML, network, Archimate, wireframes)
+- **User wants to add semantic meaning with Unicode symbols** (e.g., 🔒 for security, 💾 for database)
+- **User needs to validate PlantUML syntax** before committing
 - User mentions PlantUML explicitly
 
 ## Setup Verification
@@ -134,6 +143,122 @@ User ||--o{ Post
 
 Consult `references/toc.md` to navigate to specific diagram type guides with comprehensive examples.
 
+## Converting Source Code to Diagrams
+
+This skill includes comprehensive examples of converting common application architectures into PlantUML diagrams. The `examples/` directory contains language-specific templates and patterns.
+
+### Available Code-to-Diagram Examples
+
+#### Spring Boot Applications (`examples/spring-boot/`)
+- **Deployment Diagram**: AWS ECS deployment with RDS, ElastiCache, S3
+- **Component Diagram**: Controller → Service → Repository architecture
+- **Sequence Diagram**: Complete REST API request flow with JWT authentication
+- **Symbols**: 🌱 Spring, 🎯 Controllers, 💼 Services, 📦 Repositories, 🔒 Security
+
+**Example mapping**: When analyzing Spring Boot code, identify:
+- `@RestController` → API endpoints 🎯
+- `@Service` → Business logic 💼
+- `@Repository` → Data access 📦
+- `@Configuration` → System config ⚙️
+- Security filters → 🔒 JWT validation
+
+#### FastAPI Applications (`examples/fastapi/`)
+- **Deployment Diagram**: Kubernetes (GKE) with Cloud SQL, Memorystore Redis, Pub/Sub
+- **Component Diagram**: Async routers, dependencies, Pydantic models
+- **Symbols**: ⚡ FastAPI/Async, 🚀 Uvicorn, 🐍 Python, 📝 Pydantic, 🔒 OAuth2
+
+**Example mapping**: When analyzing FastAPI code:
+- `APIRouter` → API routers 🎯
+- `Depends()` → Dependency injection
+- `Pydantic BaseModel` → Data validation 📝
+- `async def` → Async processing ⚡
+- Background tasks → ⏱️ Async jobs
+
+#### Python ETL Pipelines (`examples/python-etl/`)
+- **Architecture Diagram**: Complete ETL pipeline with Airflow orchestration
+- **Symbols**: 🐍 Python, ⚗️ Transform, 📊 Analytics, 🐘 PostgreSQL, ☁️ Cloud storage
+
+**Example mapping**: When analyzing ETL code:
+- Data sources → 📊 Sources (databases, APIs, files)
+- Extraction logic → 📥 Extract modules
+- Transformation → ⚗️ Transform (pandas, Pydantic)
+- Data quality → ✅ Validation (Great Expectations)
+- Loading → 📤 Load to warehouse/lake
+- Scheduling → 🎯 Airflow DAGs
+
+#### Node.js Web Applications (`examples/nodejs-web/`)
+- Component diagrams for Express.js/Nest.js architectures
+- Symbols: 🟢 Node.js, ⚡ Express, 🎯 Routes, 💼 Services
+
+#### React Frontend (`examples/react-frontend/`)
+- Deployment diagrams for SPA hosting (S3 + CloudFront)
+- Component architecture diagrams
+- Symbols: ⚛️ React, 🎨 Components, 🗂️ State management
+
+### How to Use Code-to-Diagram Examples
+
+1. **Identify the application type** (Spring Boot, FastAPI, ETL, etc.)
+2. **Examine the example** in `examples/[app-type]/`
+3. **Map your code structure** to the diagram patterns
+4. **Copy and adapt** the example `.puml` file
+5. **Use consistent Unicode symbols** from the examples
+6. **Add domain-specific details** relevant to your application
+
+**Example workflow:**
+```bash
+# User has a Spring Boot microservice
+# 1. Review example
+cat examples/spring-boot/deployment-diagram.puml
+
+# 2. Copy and customize
+cp examples/spring-boot/deployment-diagram.puml my-service-deployment.puml
+# Edit my-service-deployment.puml with your service details
+
+# 3. Convert to image
+python scripts/convert_puml.py my-service-deployment.puml --format svg
+```
+
+## Unicode Symbols for Semantic Enrichment
+
+PlantUML diagrams can be enhanced with Unicode symbols to add visual meaning without cluttering with text. The comprehensive symbol guide is available at `references/unicode_symbols.md`.
+
+### Quick Symbol Reference
+
+**Common Symbols by Category:**
+
+- **Web/Network**: 🌐 Web, 📡 Communication, 🔗 Links, ⚡ Fast/Async
+- **Data/Storage**: 💾 Database, 🗄️ Warehouse, 📊 Analytics, 📁 Files
+- **Security**: 🔒 Secure, 🔑 Key/Token, 🛡️ Firewall, 👤 User
+- **System**: ⚙️ Config, 🔧 Tools, 🎯 Target/Endpoint, 💼 Business logic
+- **Messaging**: 📬 Queue, 📨 Message, 🔔 Notification, 📢 Broadcast
+- **Languages**: 🐍 Python, ☕ Java, 🟢 Node.js, 🌱 Spring Boot, ⚛️ React
+- **Cloud**: ☁️ Cloud, 🅰️ AWS, 🔵 Azure, 🟢 GCP, ☸️ Kubernetes
+- **Processing**: 🔄 Loop/Retry, ⚗️ Transform, ✅ Valid, ❌ Error
+- **Monitoring**: 📊 Metrics, 📈 Increasing, 📉 Decreasing, 🚦 Health status
+
+### Using Unicode Symbols
+
+Always enclose labels with symbols in double quotes:
+
+```puml
+@startuml
+node "☁️ AWS Cloud" as aws
+component "🔒 Security Service\nJWT Validation" as security
+database "💾 PostgreSQL" as db
+queue "📬 RabbitMQ" as mq
+
+security --> db : "🔑 Encrypted queries"
+security --> mq : "📨 Events"
+@enduml
+```
+
+**Best practices:**
+- Use consistently throughout a diagram
+- Don't overuse - 1-2 symbols per node maximum
+- Choose context-appropriate symbols
+- Combine with descriptive text
+- See `references/unicode_symbols.md` for comprehensive guide
+
 ## Converting Diagrams
 
 ### Convert Standalone .puml Files
@@ -156,32 +281,93 @@ python scripts/convert_puml.py diagram.puml --format svg --output-dir images/
 - User requests image export of created diagrams
 - Batch conversion of multiple `.puml` files needed
 
-### Extract and Convert from Markdown
+### Extract and Convert from Markdown (Enhanced)
 
-Use the `extract_and_convert_puml.py` script to process markdown files:
+**⚠️ CRITICAL for Confluence/Notion Uploads**: If you are uploading a markdown document to Confluence or Notion that contains PlantUML diagrams, you MUST use this workflow FIRST to convert diagrams to images. Confluence and Notion do not natively render PlantUML code blocks.
+
+Use the **new** `process_markdown_puml.py` script to process markdown files. This enhanced script supports **both embedded code blocks AND linked .puml files**.
 
 ```bash
-# Extract all ```puml blocks, convert to PNG, and create updated markdown
-python scripts/extract_and_convert_puml.py article.md
+# Process both embedded ```puml blocks AND linked ![](diagram.puml) files
+python scripts/process_markdown_puml.py article.md
 
 # Convert to SVG format
-python scripts/extract_and_convert_puml.py article.md --format svg
+python scripts/process_markdown_puml.py article.md --format svg
 
-# Custom image directory
-python scripts/extract_and_convert_puml.py article.md --output-dir diagrams/
+# Custom output directory
+python scripts/process_markdown_puml.py article.md --output-dir diagrams/
+
+# Validate syntax without converting (useful for CI/CD)
+python scripts/process_markdown_puml.py article.md --validate
 ```
 
 **What this script does:**
-1. Scans markdown file for all ```puml code blocks
-2. Extracts each diagram to a temporary `.puml` file
-3. Converts each diagram to PNG or SVG using plantuml.jar
-4. Replaces code blocks with image markdown: `![diagram_name](images/diagram_name.png)`
-5. Saves updated markdown as `*_with_images.md`
+
+1. **Scans for embedded code blocks**: Finds all `puml` code blocks
+2. **Scans for linked .puml files**: Finds `![diagram](path/to/diagram.puml)` links
+3. **Validates syntax**: Checks PlantUML syntax for all diagrams
+4. **Converts to images**: Generates PNG or SVG using plantuml.jar
+5. **Replaces in markdown**: Both embedded blocks and links become `![diagram_name](images/diagram_name.png)`
+6. **Saves updated markdown**: Creates `*_with_images.md` for publication
 
 **When to use:**
-- User has markdown with embedded PlantUML diagrams
-- User wants to convert documentation to include rendered diagrams
-- User needs to generate article versions with images instead of code blocks
+
+- **REQUIRED: Before uploading markdown to Confluence or Notion** if document contains PlantUML diagrams
+- User has markdown with embedded PlantUML diagrams (```puml blocks)
+- User has markdown linking to external `.puml` files (IDE-friendly workflow)
+- User wants to convert documentation for Confluence or other systems without PlantUML support
+- User needs to validate PlantUML syntax in CI/CD pipeline
+- User wants to generate article versions with images instead of code blocks
+
+**Confluence/Notion Workflow:**
+1. Detect PlantUML diagrams in markdown (```puml blocks or ![](diagram.puml) links)
+2. Run: `python scripts/process_markdown_puml.py document.md --format png`
+3. Result: `document_with_images.md` with ![](images/diagram.png) references
+4. Upload both the transformed markdown AND the images/ directory to Confluence/Notion
+
+**IDE-Friendly Workflow:**
+
+Many IDEs (IntelliJ, VS Code with extensions) can render `.puml` files directly. This workflow allows developers to keep diagrams as separate files during development, then convert for publication:
+
+```markdown
+# Development version (article.md)
+## Architecture
+
+See the deployment diagram:
+
+![Deployment](diagrams/deployment.puml)
+
+See the component diagram:
+
+![Components](diagrams/components.puml)
+```
+
+When processed:
+```bash
+python scripts/process_markdown_puml.py article.md --format svg
+```
+
+Generates `article_with_images.md`:
+```markdown
+# Development version
+## Architecture
+
+See the deployment diagram:
+
+![diagram_1_uml](images/diagram_1_uml.svg)
+
+See the component diagram:
+
+![diagram_2_uml](images/diagram_2_uml.svg)
+```
+
+**Benefits of linked .puml files:**
+- ✅ IDEs with PlantUML support render diagrams in preview
+- ✅ Diagrams are versioned separately from documentation
+- ✅ Easier to maintain and update diagrams
+- ✅ Reuse diagrams across multiple markdown files
+- ✅ Better for code reviews (diff .puml files directly)
+- ✅ Same processing script handles both embedded and linked diagrams
 
 **Example markdown input:**
 ````markdown
@@ -278,13 +464,54 @@ Available themes: `cerulean`, `bluegray`, `plain`, `sketchy`, `amiga`
 
 ### Error Handling
 
+**IMPORTANT**: PlantUML syntax is tricky and errors are common. We provide comprehensive troubleshooting resources.
+
+#### Quick Diagnosis Process
+
 If diagram generation fails:
-1. Check syntax with `java -jar plantuml.jar --check-syntax file.puml`
-2. Verify Graphviz installation for UML diagrams
-3. Review PlantUML error messages for syntax issues
-4. Consult specific diagram guide (see `references/toc.md`) for correct syntax
-5. Check `references/common_format.md` for universal elements
-6. Review `references/plantuml_reference.md` for troubleshooting
+1. **Check syntax**: `java -jar plantuml.jar --check-syntax file.puml`
+2. **Identify error type**: Missing delimiters, arrow syntax, special characters, etc.
+3. **Load troubleshooting guide**: `references/common_syntax_errors.md`
+4. **Navigate to your issue**:
+   - General syntax errors (delimiters, arrows, quotes)
+   - Diagram-specific errors (by diagram type)
+   - Setup issues (Java, Graphviz, plantuml.jar)
+
+#### When to Load Troubleshooting Resources
+
+**NEW: Comprehensive Troubleshooting Guides** (215+ common errors documented):
+
+**Start here**: Load `references/troubleshooting/toc.md` - Navigation hub with error decision tree
+
+**For specific issues**:
+- **Setup problems**: `references/troubleshooting/installation_setup_guide.md` (15 errors)
+- **Syntax errors**: `references/troubleshooting/general_syntax_guide.md` (20 errors)
+- **Arrow/relationship issues**: `references/troubleshooting/arrows_relationships_guide.md` (20 errors)
+- **Text/label problems**: `references/troubleshooting/text_labels_guide.md` (20 errors)
+- **Styling issues**: `references/troubleshooting/styling_themes_guide.md` (20 errors)
+- **Include/preprocessor**: `references/troubleshooting/preprocessor_includes_guide.md` (20 errors)
+- **Sequence diagrams**: `references/troubleshooting/sequence_diagrams_guide.md` (20 errors)
+- **Class diagrams**: `references/troubleshooting/class_diagrams_guide.md` (20 errors)
+- **ER diagrams**: `references/troubleshooting/er_diagrams_guide.md` (20 errors)
+- **Activity diagrams**: `references/troubleshooting/activity_diagrams_guide.md` (20 errors)
+- **Image generation**: `references/troubleshooting/image_generation_guide.md` (20 errors)
+- **Performance issues**: `references/troubleshooting/performance_guide.md` (20 errors)
+
+**Legacy resources** (also available):
+- `references/common_syntax_errors.md` - Original comprehensive guide
+- `references/plantuml_reference.md` - Installation and CLI reference
+
+#### Common Error Categories
+
+The troubleshooting guide covers:
+- **Delimiter errors**: Missing/mismatched `@startuml`/`@enduml`
+- **Arrow syntax errors**: Incorrect relationship symbols
+- **Quote handling**: Curly quotes, escape sequences
+- **Special characters**: Unicode, whitespace (NBSP/tabs)
+- **Preprocessor issues**: `!define`, `!include`, environment variables
+- **Styling conflicts**: Mixing `skinparam` with `<style>`
+- **Version-specific issues**: PlantUML v1.2025+ changes
+- **Diagram-specific errors**: 5+ common errors for each of 19 diagram types
 
 ## Workflow Examples
 
@@ -383,11 +610,30 @@ python scripts/convert_puml.py project_timeline.puml --format png
 
 Load these files for detailed information:
 
+### Core Syntax References
 - **`references/toc.md`**: Navigation hub linking to all 19 diagram types
 - **`references/sequence_diagrams.md`**, **`class_diagrams.md`**, **`er_diagrams.md`**, etc.: Comprehensive guides for specific diagram types
 - **`references/common_format.md`**: Universal elements shared across all diagram types (delimiters, metadata, comments, notes)
 - **`references/styling_guide.md`**: Modern `<style>` syntax with CSS-like rules, stereotypes, and advanced styling
 - **`references/plantuml_reference.md`**: Installation, command-line operations, and troubleshooting
+
+### New Resources
+
+**Troubleshooting Guides** (⚠️ START HERE FOR ERRORS):
+- **`references/troubleshooting/toc.md`**: **Navigation hub** with error decision tree and quick reference
+- **`references/troubleshooting/*.md`**: **12 focused guides** covering 215+ common errors
+  - Installation & setup, general syntax, arrows, text/labels, styling
+  - Sequence, class, ER, activity diagram-specific errors
+  - Preprocessor, image generation, performance issues
+
+**Other Resources**:
+- **`references/common_syntax_errors.md`**: Original comprehensive guide (1,755 lines, all 19 diagram types)
+- **`references/unicode_symbols.md`**: Unicode symbol guide for semantic enrichment (🔒 🌐 💾 ⚙️ etc.)
+- **`examples/spring-boot/`**: Spring Boot to PlantUML diagram examples (deployment, component, sequence)
+- **`examples/fastapi/`**: FastAPI/Python async to PlantUML diagram examples
+- **`examples/python-etl/`**: Python ETL pipeline architecture diagrams
+- **`examples/nodejs-web/`**: Node.js/Express application diagrams
+- **`examples/react-frontend/`**: React frontend deployment and component diagrams
 
 ## Summary
 
@@ -397,9 +643,19 @@ To use this skill effectively:
 2. **Navigate diagram types**: Start with `references/toc.md` to find the right diagram type
 3. **Learn syntax**: Open specific diagram guides (e.g., `references/sequence_diagrams.md`) for detailed examples
 4. **Use modern styling**: Apply `<style>` syntax from `references/styling_guide.md` for professional appearance
-5. **Understand universal elements**: Review `references/common_format.md` for shared syntax across diagrams
-6. **Convert standalone files**: Use `scripts/convert_puml.py` for `.puml` to image conversion
-7. **Process markdown**: Use `scripts/extract_and_convert_puml.py` to extract and convert embedded diagrams
-8. **Troubleshoot**: Consult `references/plantuml_reference.md` for installation and CLI help
+5. **Enrich with symbols**: Use Unicode symbols from `references/unicode_symbols.md` for visual clarity (🔒 💾 ⚙️)
+6. **Map code to diagrams**: Review `examples/[framework]/` for code-to-diagram patterns (Spring Boot, FastAPI, ETL, etc.)
+7. **Convert standalone files**: Use `scripts/convert_puml.py` for `.puml` to image conversion
+8. **Process markdown (enhanced)**: Use `scripts/process_markdown_puml.py` for both embedded ```puml blocks AND linked .puml files
+9. **Validate syntax**: Use `--validate` flag for CI/CD pipeline checks
+10. **IDE-friendly workflow**: Link to `.puml` files in markdown for IDE preview, convert for publication
+11. **Troubleshoot**: Consult `references/plantuml_reference.md` for installation and CLI help
 
-This skill supports all PlantUML capabilities including UML diagrams (sequence, class, activity, state, component, deployment, use case, object, timing), non-UML diagrams (ER, Gantt, mindmap, WBS, JSON/YAML, network, Archimate, wireframes), modern `<style>` styling, and advanced features (themes, hyperlinks, icons).
+This skill supports all PlantUML capabilities including:
+- **UML diagrams**: sequence, class, activity, state, component, deployment, use case, object, timing
+- **Non-UML diagrams**: ER, Gantt, mindmap, WBS, JSON/YAML, network, Archimate, wireframes
+- **Modern styling**: `<style>` syntax with CSS-like rules
+- **Unicode symbols**: Semantic enrichment with 🌐 🔒 💾 ⚙️ 📊 and 100+ other symbols
+- **Code-to-diagram**: Examples for Spring Boot, FastAPI, Python ETL, Node.js, React
+- **Advanced features**: Themes, hyperlinks, icons, validation
+- **Markdown integration**: Embedded code blocks AND linked .puml files

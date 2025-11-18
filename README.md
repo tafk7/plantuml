@@ -1,12 +1,17 @@
 # PlantUML Claude Skill
 
-A comprehensive Claude Code skill for generating PlantUML diagrams from text descriptions and converting them to images. This skill supports all 19 PlantUML diagram types and provides powerful tools to extract diagrams from markdown files.
+A comprehensive Claude Code skill for generating PlantUML diagrams from text descriptions, converting source code to architecture diagrams, and processing markdown files. This skill supports all 19 PlantUML diagram types with enhanced features for real-world development workflows.
 
 ## Features
 
 - **Generate diagrams from natural language** - Describe what you want, get PlantUML syntax
+- **Convert source code to diagrams** - 🌱 Spring Boot, ⚡ FastAPI, 🐍 Python ETL, 🟢 Node.js, ⚛️ React examples
 - **Convert `.puml` files to images** - Generate PNG or SVG from standalone PlantUML files
-- **Extract diagrams from markdown** - Find all `puml` code blocks, convert to images, and create updated markdown with image links
+- **Extract diagrams from markdown** - Process both embedded ```puml blocks AND linked .puml files
+- **Unicode symbol enrichment** - Add semantic meaning with 🔒 💾 ⚙️ 🌐 📊 and 100+ symbols
+- **Validate PlantUML syntax** - CI/CD-ready validation without conversion
+- **IDE-friendly workflow** - Link to .puml files for IDE preview, convert for publication
+- **Confluence-ready output** - Convert PlantUML to images for doc systems without native support
 - **Comprehensive diagram support** - All UML (sequence, class, activity, state, etc.) and non-UML types (ER, Gantt, mindmap, etc.)
 - **Modern styling** - CSS-like `<style>` syntax for professional diagram appearance
 
@@ -30,15 +35,74 @@ python scripts/convert_puml.py my_diagram.puml
 python scripts/convert_puml.py my_diagram.puml --format svg --output-dir images/
 ```
 
-### 3. Extract Diagrams from Markdown
+### 3. Process Markdown with PlantUML (Enhanced)
 
 ```bash
-# Process markdown file with ```puml code blocks
-python scripts/extract_and_convert_puml.py article.md
+# NEW: Process both embedded ```puml blocks AND linked ![](diagram.puml) files
+python scripts/process_markdown_puml.py article.md
 
-# Use SVG format
-python scripts/extract_and_convert_puml.py article.md --format svg
+# Validate syntax without converting (great for CI/CD)
+python scripts/process_markdown_puml.py article.md --validate
+
+# Convert to SVG format
+python scripts/process_markdown_puml.py article.md --format svg
 ```
+
+## New in This Release
+
+### 🎯 Code-to-Diagram Examples
+
+Convert real-world application architectures to PlantUML diagrams with comprehensive examples in `examples/`:
+
+- **🌱 Spring Boot**: AWS ECS deployment, component architecture, REST API sequence flows
+- **⚡ FastAPI**: Kubernetes deployment, async architecture, Pydantic validation flows
+- **🐍 Python ETL**: Complete pipeline with Airflow, data quality, monitoring
+- **🟢 Node.js**: Express/Nest.js component diagrams
+- **⚛️ React**: SPA deployment (S3 + CloudFront), component architecture
+
+Each example includes deployment, component, and sequence diagrams with production-ready patterns.
+
+### 🎨 Unicode Symbol Enrichment
+
+Enhance diagrams with semantic Unicode symbols (see `references/unicode_symbols.md`):
+
+```puml
+node "☁️ AWS Cloud" as aws
+component "🔒 Security Service" as security
+database "💾 PostgreSQL" as db
+queue "📬 RabbitMQ" as mq
+component "⚡ FastAPI App" as api
+```
+
+**Symbol categories**: Web 🌐, Data 💾, Security 🔒, System ⚙️, Messaging 📬, Languages 🐍, Cloud ☁️, Processing 🔄, Monitoring 📊
+
+### 🔗 Linked .puml Files Support
+
+**NEW**: Reference external `.puml` files in markdown for IDE-friendly workflows:
+
+```markdown
+## Architecture
+
+![Deployment](diagrams/deployment.puml)
+![Components](diagrams/components.puml)
+```
+
+Benefits:
+- ✅ IDEs with PlantUML support render diagrams in preview
+- ✅ Version control tracks diagram changes separately
+- ✅ Reuse diagrams across multiple markdown files
+- ✅ Better code reviews (diff .puml files directly)
+- ✅ Same script converts both embedded and linked diagrams
+
+### ✅ Syntax Validation
+
+Validate PlantUML syntax without generating images:
+
+```bash
+python scripts/process_markdown_puml.py article.md --validate
+```
+
+Perfect for CI/CD pipelines to catch syntax errors before merging.
 
 ## Installation
 
@@ -251,7 +315,9 @@ Options:
   --output-dir <path>    Directory for output images (default: same as input)
 ```
 
-### extract_and_convert_puml.py
+### extract_and_convert_puml.py (Legacy)
+
+*Note: Consider using `process_markdown_puml.py` for enhanced features.*
 
 Extracts PlantUML diagrams from markdown and converts to images.
 
@@ -269,6 +335,34 @@ Workflow:
 3. Converts to PNG/SVG using plantuml.jar
 4. Replaces code blocks with `![name](images/name.png)` links
 5. Saves updated markdown as `*_with_images.md`
+
+### process_markdown_puml.py (Enhanced)
+
+**NEW**: Enhanced markdown processor supporting both embedded code blocks AND linked `.puml` files.
+
+```bash
+python scripts/process_markdown_puml.py <file.md> [options]
+
+Options:
+  --format png|svg       Output format (default: png)
+  --output-dir <path>    Directory for images (default: images/)
+  --validate             Validate syntax without converting (CI/CD mode)
+```
+
+Workflow:
+1. Scans for embedded ```puml code blocks
+2. **NEW**: Scans for linked .puml files: `![diagram](path/to/diagram.puml)`
+3. **NEW**: Validates PlantUML syntax for all diagrams
+4. Converts to PNG/SVG using plantuml.jar
+5. Replaces both code blocks AND links with `![name](images/name.png)`
+6. Saves updated markdown as `*_with_images.md`
+
+**Key advantages:**
+- ✅ Supports IDE-friendly workflow (link to external .puml files)
+- ✅ Validates syntax before conversion
+- ✅ CI/CD ready with `--validate` flag
+- ✅ Processes both embedded and linked diagrams in single pass
+- ✅ Better error messages with line numbers
 
 ## Advanced Usage
 
@@ -341,11 +435,20 @@ Available themes: `cerulean`, `bluegray`, `plain`, `sketchy`, `amiga`
 
 The `references/` directory contains comprehensive guides:
 
+### Core References
 - **[toc.md](references/toc.md)** - Navigation hub for all diagram types
 - **[plantuml_reference.md](references/plantuml_reference.md)** - Installation, CLI, troubleshooting
 - **[common_format.md](references/common_format.md)** - Universal syntax elements
 - **[styling_guide.md](references/styling_guide.md)** - Modern `<style>` syntax guide
 - **[sequence_diagrams.md](references/sequence_diagrams.md)**, **[class_diagrams.md](references/class_diagrams.md)**, etc. - Detailed guides for each diagram type
+
+### New Resources
+- **[unicode_symbols.md](references/unicode_symbols.md)** - 🌐 🔒 💾 ⚙️ 📊 Complete Unicode symbol guide for semantic enrichment
+- **[examples/spring-boot/](examples/spring-boot/)** - 🌱 Spring Boot deployment, component, and sequence diagram examples
+- **[examples/fastapi/](examples/fastapi/)** - ⚡ FastAPI Kubernetes deployment and async architecture examples
+- **[examples/python-etl/](examples/python-etl/)** - 🐍 Python ETL pipeline architecture with Airflow
+- **[examples/nodejs-web/](examples/nodejs-web/)** - 🟢 Node.js/Express component diagrams
+- **[examples/react-frontend/](examples/react-frontend/)** - ⚛️ React SPA deployment diagrams
 
 ## Troubleshooting
 
