@@ -19,7 +19,9 @@ This skill enables PlantUML diagram creation and conversion. Use for: diagram ge
 
 **IF** user mentions:
 - "create [diagram type]" OR "generate diagram" OR "draw diagram"
-  → **Route to**: Diagram Creation Workflow (Step 2)
+  → **Route to**: **Resilient Workflow (PRIMARY)** - `references/workflows/resilient-execution-guide.md`
+  → **Script**: `python scripts/resilient_processor.py file.md [--format png]`
+  → **Backup Route**: Diagram Creation Workflow (Step 2) if script unavailable
 
 - "convert .puml" OR "convert file" OR ".puml to image"
   → **Route to**: `guides/workflows/conversion-workflow.md`
@@ -268,6 +270,22 @@ Checks: Java, Graphviz, plantuml.jar
 **Route**: `guides/workflows/styling-workflow.md`
 **Supporting**: `guides/styling/basic-styling.md` or `guides/styling/advanced-styling.md`
 
+### 7. Resilient Workflow (PRIMARY)
+**Trigger**: ALL diagram creation requests (recommended default)
+**Route**: `references/workflows/resilient-execution-guide.md`
+**Script**: `python scripts/resilient_processor.py file.md [--format png|svg]`
+**Steps**:
+  1. Identify type → Load reference
+  2. Create file → Structured naming: `./diagrams/<md>_<num>_<type>_<title>.puml`
+  3. Convert → Handle errors with troubleshooting guides (max 3 retries)
+  4. Validate → Integrate into markdown
+**Error Fallback**: Perplexity → Brave Search → Gemini → WebSearch
+**Benefits**:
+  - Consistent file naming for organization
+  - Automatic error recovery with troubleshooting guides
+  - External search fallback for unresolved errors
+  - Validation before markdown integration
+
 ## Quick Reference (Minimal)
 
 **Universal Structure:**
@@ -280,6 +298,7 @@ Checks: Java, Graphviz, plantuml.jar
 **Common Arrows**: `->` solid, `-->` dashed, `..>` dotted
 
 **Scripts:**
+- **Resilient (PRIMARY)**: `python scripts/resilient_processor.py file.md [--format png]`
 - Convert: `python scripts/convert_puml.py file.puml [--format svg]`
 - Markdown: `python scripts/process_markdown_puml.py doc.md [--validate]`
 - Setup check: `python scripts/check_setup.py`
