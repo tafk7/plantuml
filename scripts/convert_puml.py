@@ -9,7 +9,40 @@ Usage:
 import sys
 import subprocess
 import os
+import shutil
 from pathlib import Path
+
+
+def find_plantuml_command() -> tuple:
+    """
+    Find PlantUML executable - checks for command first, then JAR.
+
+    Returns:
+        Tuple of (command_list, method) where method is 'command' or 'jar'
+    """
+    # First, check for plantuml command in PATH (works with any package manager)
+    # Homebrew (macOS), Chocolatey (Windows), apt/yum (Linux), etc.
+    plantuml_cmd = shutil.which('plantuml')
+    if plantuml_cmd:
+        return ([plantuml_cmd], 'command')
+
+    # Common fallback locations if not in PATH
+    common_paths = [
+        '/opt/homebrew/bin/plantuml',  # macOS Apple Silicon
+        '/usr/local/bin/plantuml',      # macOS Intel / Linux
+        '/usr/bin/plantuml',            # Linux system install
+    ]
+    for path in common_paths:
+        if os.path.exists(path) and os.access(path, os.X_OK):
+            return ([path], 'command')
+
+    # Fall back to JAR file
+    jar_path = find_plantuml_jar()
+    if jar_path:
+        return (['java', '-jar', jar_path], 'jar')
+
+    return (None, None)
+
 
 def find_plantuml_jar() -> str:
     """Search for plantuml.jar in common locations."""
@@ -19,11 +52,21 @@ def find_plantuml_jar() -> str:
         '/usr/share/plantuml/plantuml.jar',
         os.path.expanduser('~/plantuml.jar'),
         os.path.expanduser('~/bin/plantuml.jar'),
+        # Homebrew Cellar location (version may vary)
+        '/opt/homebrew/Cellar/plantuml/*/libexec/plantuml.jar',
     ]
 
     for path in common_paths:
-        if os.path.exists(path):
+        if '*' not in path and os.path.exists(path):
             return path
+
+    # Check glob patterns
+    from glob import glob
+    for path in common_paths:
+        if '*' in path:
+            matches = glob(path)
+            if matches:
+                return matches[0]
 
     # Check environment variable
     plantuml_path = os.environ.get('PLANTUML_JAR')
@@ -31,6 +74,7 @@ def find_plantuml_jar() -> str:
         return plantuml_path
 
     return ''
+
 
 def convert_puml(puml_file: str, format: str = 'png', output_dir: str = None) -> bool:
     """
@@ -44,18 +88,22 @@ def convert_puml(puml_file: str, format: str = 'png', output_dir: str = None) ->
     Returns:
         True if successful, False otherwise
     """
-    plantuml_jar = find_plantuml_jar()
-    if not plantuml_jar:
-        print("ERROR: plantuml.jar not found. Please download from https://plantuml.com/download")
-        print("You can set PLANTUML_JAR environment variable to specify the location.")
+    cmd_base, method = find_plantuml_command()
+    if not cmd_base:
+        print("ERROR: PlantUML not found.")
+        print("Install via Homebrew: brew install plantuml")
+        print("Or download JAR from: https://plantuml.com/download")
+        print("Or set PLANTUML_JAR environment variable.")
         return False
 
-    format_flag = '--svg' if format == 'svg' else '--png'
-    cmd = ['java', '-jar', plantuml_jar, format_flag]
+    format_flag = '-tsvg' if format == 'svg' else '-tpng'
+    cmd = cmd_base + [format_flag]
 
     if output_dir:
-        Path(output_dir).mkdir(exist_ok=True, parents=True)
-        cmd.extend(['--output-dir', output_dir])
+        # Use absolute path - PlantUML's -o flag is relative to input file location
+        abs_output_dir = str(Path(output_dir).resolve())
+        Path(abs_output_dir).mkdir(exist_ok=True, parents=True)
+        cmd.extend(['-o', abs_output_dir])
 
     cmd.append(puml_file)
 
@@ -68,7 +116,7 @@ def convert_puml(puml_file: str, format: str = 'png', output_dir: str = None) ->
 
     output_name = Path(puml_file).stem + f".{format}"
     if output_dir:
-        output_path = Path(output_dir) / output_name
+        output_path = Path(output_dir).resolve() / output_name
     else:
         output_path = Path(puml_file).parent / output_name
 

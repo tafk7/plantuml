@@ -90,6 +90,51 @@ When a user requests a diagram:
 
 5. **Convert to image** using the conversion script (see below)
 
+### Resilient Workflow (Primary - Recommended)
+
+For reliable diagram generation with error recovery, use the 4-step resilient workflow:
+
+#### Step 1: Identify Diagram Type & Load Reference
+- Identify diagram type from user intent (sequence, class, ER, etc.)
+- Load `references/[diagram_type]_diagrams.md` for syntax guide
+- If ambiguous, consult `references/toc.md`
+
+#### Step 2: Create File with Structured Naming
+Save diagrams using the naming convention:
+```
+./diagrams/<markdown_name>_<num>_<type>_<title>.puml
+```
+
+**Examples:**
+```
+./diagrams/architecture_001_sequence_user_authe.puml
+./diagrams/api_design_002_class_order_servi.puml
+```
+
+**Automated:**
+```bash
+python scripts/resilient_processor.py article.md --format png
+```
+
+#### Step 3: Convert with Error Handling (max 3 retries)
+If conversion fails:
+1. Check `references/troubleshooting/toc.md` for error classification
+2. Load specific guide from `references/troubleshooting/[category]_guide.md`
+3. Check `references/common_syntax_errors.md` for diagram type
+4. **External search fallback** (in order):
+   - Perplexity (`mcp__perplexity-ask__perplexity_ask`)
+   - Brave Search (`mcp__brave-search__brave_web_search`)
+   - Gemini skill
+   - WebSearch tool
+
+#### Step 4: Validate & Integrate into Markdown
+**Only after successful generation:**
+1. Verify image file exists at expected path
+2. Add image link: `![title](diagrams/filename.png)`
+3. Keep .puml source file for future edits
+
+**Full documentation:** `references/workflows/resilient-execution-guide.md`
+
 ### Syntax Reference Quick Guide
 
 **Common Elements:**
