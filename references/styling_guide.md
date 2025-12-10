@@ -1314,6 +1314,126 @@ Deployed --> [*]
 
 ---
 
+## Text Contrast Best Practices
+
+**CRITICAL**: Always ensure sufficient contrast between text and background colors. Light text on light backgrounds is unreadable.
+
+### The Contrast Rule
+
+| Background | Text Color | Example |
+|------------|------------|---------|
+| Light pastels (#E1F5FE, #FFF3E0, #C8E6C9) | Dark variants (#01579B, #E65100, #1B5E20) | ✅ Good |
+| Light backgrounds | White or light colors | ❌ Bad - unreadable |
+| Dark backgrounds (#1565C0, #E65100) | White (#FFFFFF) | ✅ Good |
+
+### Material Design Color Pairings
+
+Use these proven background/text combinations:
+
+| Category | Background | FontColor | Use For |
+|----------|------------|-----------|---------|
+| Blue | #E3F2FD (Light Blue 50) | #0D47A1 (Blue 900) | AWS, Services |
+| Orange | #FFF3E0 (Orange 50) | #E65100 (Orange 800) | Warnings, AWS |
+| Green | #E8F5E9 (Green 50) | #1B5E20 (Green 900) | Kafka, Success |
+| Purple | #F3E5F5 (Purple 50) | #4A148C (Purple 900) | Database |
+| Yellow | #FFFDE7 (Yellow 50) | #333333 (Gray 800) | Notes |
+| Red | #FFEBEE (Red 50) | #B71C1C (Red 900) | Errors |
+
+### Example: High-Contrast Component Diagram
+
+```puml
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultTextAlignment center
+skinparam component {
+    BackgroundColor<<shell>> #E1F5FE
+    FontColor<<shell>> #01579B
+    BackgroundColor<<aws>> #FFF3E0
+    FontColor<<aws>> #E65100
+    BackgroundColor<<kafka>> #E8F5E9
+    FontColor<<kafka>> #1B5E20
+    BackgroundColor<<database>> #F3E5F5
+    FontColor<<database>> #4A148C
+}
+skinparam package {
+    FontColor #1A237E
+}
+skinparam note {
+    BackgroundColor #FFFDE7
+    FontColor #333333
+    BorderColor #FBC02D
+}
+skinparam legend {
+    BackgroundColor #F5F5F5
+    FontColor #212121
+    BorderColor #9E9E9E
+}
+
+component "API Service" <<aws>>
+component "Kafka Topic" <<kafka>>
+database "PostgreSQL" <<database>>
+
+[API Service] --> [Kafka Topic]
+[Kafka Topic] --> [PostgreSQL]
+
+note right of [API Service]
+  High contrast note text
+  on light yellow background
+end note
+@enduml
+```
+
+### Legacy skinparam FontColor Pattern
+
+When using legacy `skinparam` with stereotypes, **always pair BackgroundColor with FontColor**:
+
+```puml
+skinparam component {
+    BackgroundColor<<aws>> #FFF3E0
+    FontColor<<aws>> #E65100        ' ALWAYS include FontColor!
+    BackgroundColor<<kafka>> #C8E6C9
+    FontColor<<kafka>> #1B5E20      ' ALWAYS include FontColor!
+}
+```
+
+### Common Contrast Mistakes
+
+❌ **Bad - Light on Light**:
+```puml
+skinparam component {
+    BackgroundColor #E3F2FD   ' Light blue background
+    ' Missing FontColor - defaults to black which is OK
+    ' But white or light gray would be unreadable!
+}
+```
+
+✅ **Good - Dark on Light**:
+```puml
+skinparam component {
+    BackgroundColor #E3F2FD   ' Light blue background
+    FontColor #0D47A1         ' Dark blue text
+}
+```
+
+### Note and Legend Styling
+
+Notes and legends often have readability issues. Always specify:
+
+```puml
+skinparam note {
+    BackgroundColor #FFFDE7    ' Light yellow
+    FontColor #333333          ' Dark gray - NOT default which may be light
+    BorderColor #FBC02D        ' Amber border for visual separation
+}
+skinparam legend {
+    BackgroundColor #F5F5F5    ' Light gray
+    FontColor #212121          ' Near black
+    BorderColor #9E9E9E        ' Medium gray
+}
+```
+
+---
+
 ## Summary
 
 ### Modern Styling Best Practices
@@ -1325,6 +1445,8 @@ Deployed --> [*]
 5. ✅ **Apply consistent theming** across related diagrams
 6. ✅ **Use Creole formatting** for rich text in notes and labels
 7. ✅ **Keep styles separate** from diagram content
+8. ✅ **ALWAYS pair BackgroundColor with FontColor** for readable contrast
+9. ✅ **Use dark text on light backgrounds** (Material Design 800-900 shades on 50-100 shades)
 
 ### Quick Reference
 
